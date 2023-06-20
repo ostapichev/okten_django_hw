@@ -7,6 +7,7 @@ from .filters import car_filtered_queryset
 
 class CarListView(ListAPIView):
     serializer_class = CarSerializer
+
     def get_queryset(self):
         return car_filtered_queryset(self.request.query_params)
 
