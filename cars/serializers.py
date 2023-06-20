@@ -14,6 +14,16 @@ class CarAllSerializer(CarBaseSerializer):
 
 
 class CarSerializer(CarBaseSerializer):
+    """
+        Створити модель Car з такими полями:
+            - марка машини
+            - рік випуску
+            - кількість місць
+            - тип кузову
+            - об'єм двигуна (float)
+            реалізувати всі CRUD операції
+            при виведені всіх машин показувати тільки (id, марку машини та рік)
+    """
     num_seats = serializers.IntegerField()
     body_type = serializers.CharField(max_length=15)
     engine_volume = serializers.FloatField()
