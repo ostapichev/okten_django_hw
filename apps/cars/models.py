@@ -13,3 +13,4 @@ class CarModel(BaseModel):
 
     class Meta:
         db_table = 'cars'
+        ordering = ('id',)

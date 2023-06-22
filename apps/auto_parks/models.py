@@ -8,3 +8,4 @@ class AutoParkModel(BaseModel):
 
     class Meta:
         db_table = 'auto_parks'
+        ordering = ('id',)
