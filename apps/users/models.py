@@ -1,24 +1,38 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.core import validators
 from django.db import models
 
+from core.enums.regex_enum import RegExEnum
 from core.models import BaseModel
 
 from apps.users.managers import UserManager
 
 
 class ProfileModel(BaseModel):
-    name = models.CharField(max_length=50)
-    surname = models.CharField(max_length=50)
-    age = models.IntegerField()
+    name = models.CharField(max_length=50, validators=(
+        validators.RegexValidator(RegExEnum.NAME.pattern, RegExEnum.NAME.msg),
+    ))
+    surname = models.CharField(max_length=50, validators=(
+        validators.RegexValidator(RegExEnum.SURNAME.pattern, RegExEnum.SURNAME.msg),
+    ))
+    age = models.IntegerField(validators=(
+        validators.MinValueValidator(16),
+        validators.MaxValueValidator(150)
+    ))
 
     class Meta:
         db_table = 'profile'
+        ordering = ('id', 'name', 'surname', 'age')
 
 
 class UserModel(AbstractBaseUser, PermissionsMixin, BaseModel):
     USERNAME_FIELD = 'email'
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
+    email = models.EmailField(unique=True, validators=(
+        validators.RegexValidator(RegExEnum.EMAIL.pattern, RegExEnum.EMAIL.msg),
+    ))
+    password = models.CharField(max_length=128, validators=(
+        validators.RegexValidator(RegExEnum.PASSWORD.pattern, RegExEnum.PASSWORD.msg),
+    ))
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     profile = models.OneToOneField(ProfileModel, on_delete=models.CASCADE, related_name='user')
