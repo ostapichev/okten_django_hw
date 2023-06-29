@@ -13,7 +13,8 @@ from .serializers import AutoParkSerializer
 
 class AutoParkListCreateView(ListCreateAPIView):
     serializer_class = AutoParkSerializer
-    queryset = AutoParkModel.objects.all()
+    queryset = AutoParkModel.objects.all_with_cars()
+    pagination_class = None
 
 
 class AutoParkRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):

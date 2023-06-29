@@ -1,7 +1,5 @@
 from django_filters import rest_framework as filters
 
-from apps.users.models import UserModel
-
 
 class UserFilter(filters.FilterSet):
     email_start = filters.CharFilter('email', 'istartswith')

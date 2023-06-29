@@ -8,6 +8,7 @@ from core.models import BaseModel
 
 from apps.auto_parks.models import AutoParkModel
 from apps.cars.choices.body_type_choices import BodyTypeChoices
+from apps.cars.manager import CarManager
 
 
 class CarModel(BaseModel):
@@ -24,6 +25,8 @@ class CarModel(BaseModel):
         validators.MaxValueValidator(datetime.now().year)
     ))
     auto_park = models.ForeignKey(AutoParkModel, on_delete=models.CASCADE, related_name='cars')
+    objects = models.Manager()
+    my_objects = CarManager()
 
     class Meta:
         db_table = 'cars'

@@ -12,7 +12,7 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_super_user(self, email, password, **extra_kwargs):
+    def create_superuser(self, email, password, **extra_kwargs):
         extra_kwargs.setdefault('is_staff', True)
         extra_kwargs.setdefault('is_superuser', True)
         extra_kwargs.setdefault('is_active', True)
@@ -24,3 +24,6 @@ class UserManager(BaseUserManager):
 
         user = self.create_user(email, password, **extra_kwargs)
         return user
+
+    def all_with_profiles(self):
+        return self.select_related('profile')

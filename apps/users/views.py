@@ -12,5 +12,5 @@ UserModel: User = get_user_model()
 
 class UserListCreateView(ListCreateAPIView):
     serializer_class = UserSerializer
-    queryset = UserModel.objects.all()
+    queryset = UserModel.objects.all_with_profiles()
     filterset_class = UserFilter

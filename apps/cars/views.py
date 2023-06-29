@@ -7,7 +7,7 @@ from .serializers import CarSerializer
 
 class CarListView(ListAPIView):
     serializer_class = CarSerializer
-    queryset = CarModel.objects.all()
+    queryset = CarModel.my_objects.all()
     filterset_class = CarFilter
 
 
