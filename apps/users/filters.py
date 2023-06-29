@@ -11,3 +11,13 @@ class UserFilter(filters.FilterSet):
     surname_contains = filters.CharFilter(field_name='profile__surname', lookup_expr='icontains')
     surname_start = filters.CharFilter(field_name='profile__surname', lookup_expr='istartswith')
 
+    order = filters.OrderingFilter(
+        fields=(
+            'id',
+            'email',
+            ('profile__name', 'name'),
+            ('profile__surname', 'surname'),
+            ('profile__age', 'age'),
+        )
+    )
+
