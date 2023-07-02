@@ -4,6 +4,7 @@ from django.db import models
 
 from core.enums.regex_enum import RegExEnum
 from core.models import BaseModel
+from core.services.upload_avatar_service import upload_avatar
 
 from apps.users.managers import UserManager
 
@@ -19,6 +20,7 @@ class ProfileModel(BaseModel):
         validators.MinValueValidator(16),
         validators.MaxValueValidator(150)
     ))
+    avatar = models.ImageField(upload_to=upload_avatar, blank=True)
 
     class Meta:
         db_table = 'profile'

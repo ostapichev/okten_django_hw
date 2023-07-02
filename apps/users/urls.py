@@ -6,12 +6,14 @@ from .views import (
     BlockUserView,
     UnBlockAdminUserView,
     UnBlockUserView,
+    UserAddAvatarView,
     UserListCreateView,
     UserToAdminView,
 )
 
 urlpatterns = [
     path('', UserListCreateView.as_view()),
+    path('/avatar', UserAddAvatarView.as_view()),
     path('/<int:pk>/to_admin', UserToAdminView.as_view()),
     path('/<int:pk>/to_user', AdminToUserView.as_view()),
     path('/<int:pk>/block_user', BlockUserView.as_view()),
