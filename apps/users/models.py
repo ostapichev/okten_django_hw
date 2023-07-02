@@ -35,7 +35,7 @@ class UserModel(AbstractBaseUser, PermissionsMixin, BaseModel):
     password = models.CharField(max_length=128, validators=(
         validators.RegexValidator(RegExEnum.PASSWORD.pattern, RegExEnum.PASSWORD.msg),
     ))
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     profile = models.OneToOneField(ProfileModel, on_delete=models.CASCADE, related_name='user', null=True)
     objects = UserManager()

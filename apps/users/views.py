@@ -2,10 +2,11 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListCreateAPIView, UpdateAPIView
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
 from core.permission import IsAdminOrWriteOnlyPermission, IsSuperUser
+from core.services.email_service import EmailService
 
 from .filters import UserFilter
 from .models import UserModel as User
@@ -108,3 +109,11 @@ class BlockAdminUserView(BlockUserView):
 class UnBlockAdminUserView(UnBlockUserView):
     permission_classes = (IsSuperUser,)
     queryset = UserModel.objects.all()
+
+
+class TestEmail(GenericAPIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, *args, **kwargs):
+        EmailService.test_email()
+        return Response('ok')
