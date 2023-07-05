@@ -7,7 +7,6 @@ from rest_framework_simplejwt.tokens import BlacklistMixin, Token
 from core.enums.action_token_enum import ActionTokenEnum
 
 from apps.users.models import UserModel
-from apps.users.models import UserModel as User
 
 ActionTokenClassType = Type[BlacklistMixin | Token]
 
@@ -19,6 +18,11 @@ class ActionToken(BlacklistMixin, Token):
 class ActivateToken(ActionToken):
     token_type = ActionTokenEnum.ACTIVATE.token_type
     lifetime = ActionTokenEnum.ACTIVATE.life_time
+
+
+class RecoveryToken(ActionToken):
+    token_type = ActionTokenEnum.RECOVERY.token_type
+    lifetime = ActionTokenEnum.RECOVERY.life_time
 
 
 class JWTService:
