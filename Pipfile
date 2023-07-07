@@ -6,11 +6,10 @@ name = "pypi"
 [packages]
 djangorestframework = "*"
 mysqlclient = "*"
-response = "*"
 django-filter = "*"
 djangorestframework-simplejwt = "*"
 pillow = "*"
-django-cors-headers = "*"
+
 
 [dev-packages]
 isort = "*"
