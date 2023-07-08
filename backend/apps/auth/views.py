@@ -17,6 +17,9 @@ UserModel: User = get_user_model()
 
 
 class MeView(RetrieveAPIView):
+    """
+        View my account
+    """
     serializer_class = UserSerializer
 
     def get_object(self):
@@ -24,6 +27,9 @@ class MeView(RetrieveAPIView):
 
 
 class ActivateUserView(GenericAPIView):
+    """
+        User activation
+    """
     permission_classes = (AllowAny,)
 
     @staticmethod
@@ -37,6 +43,9 @@ class ActivateUserView(GenericAPIView):
 
 
 class RecoveryPasswordRequestView(GenericAPIView):
+    """
+        Recovery password
+    """
     permission_classes = (AllowAny,)
     serializer_class = EmailSerializer
 
@@ -50,6 +59,9 @@ class RecoveryPasswordRequestView(GenericAPIView):
 
 
 class RecoveryPasswordView(GenericAPIView):
+    """
+        Change password
+    """
     permission_classes = (AllowAny,)
     serializer_class = PasswordSerializer
 

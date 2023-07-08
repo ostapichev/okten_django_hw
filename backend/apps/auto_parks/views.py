@@ -13,6 +13,12 @@ from .serializers import AutoParkSerializer
 
 
 class AutoParkListCreateView(ListCreateAPIView):
+    """
+        get:
+            Auto parks view
+        post:
+            Creation of auto parks
+    """
     serializer_class = AutoParkSerializer
     queryset = AutoParkModel.objects.all_with_cars()
     pagination_class = None
@@ -24,11 +30,27 @@ class AutoParkListCreateView(ListCreateAPIView):
 
 
 class AutoParkRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    """
+        get:
+            Get an auto park by id
+        put:
+            Updating an auto park data by id
+        path:
+            Auto park correction by id
+        delete:
+            Deleting an auto park by id
+    """
     serializer_class = AutoParkSerializer
     queryset = AutoParkModel.objects.all()
 
 
 class AutoParkCarListCreateView(GenericAPIView):
+    """
+        get:
+            Get all cars
+        post:
+            Creation a car in auto park by id
+    """
     queryset = AutoParkModel.objects.all()
 
     def get(self, *args, **kwargs):
