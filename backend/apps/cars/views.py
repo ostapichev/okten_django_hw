@@ -21,6 +21,7 @@ class CarListView(ListAPIView):
     permission_classes = (AllowAny,)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(security=[]))
 class CarRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     """
         get:
