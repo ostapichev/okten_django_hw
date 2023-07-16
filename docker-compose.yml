@@ -42,7 +42,7 @@ services:
     depends_on:
       - redis
     command: >
-      sh -c "celery -A configs worker -l info -B"
+      sh -c "celery -A configs worker -l info"
 
   redis:
     image: redis:alpine
@@ -56,3 +56,4 @@ services:
     ports:
       - "5555:5555"
     command: [ "flower", "--broker=redis://redis:6379", "--port=5555" ]
+

@@ -8,7 +8,7 @@ connection: DatabaseWrapper = connection
 
 
 class Command(BaseCommand):
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **options):
         self.stdout.write('Wait for db...')
         db_con = False
 
@@ -20,4 +20,4 @@ class Command(BaseCommand):
                 self.stdout.write('Database unavailable, wait 3 second...')
                 time.sleep(3)
 
-        self.stdout.write('Database available!!!')
+        self.stdout.write('Database available!!!!')
