@@ -47,7 +47,7 @@ class AutoParkRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
 class AutoParkCarListCreateView(GenericAPIView):
     """
         get:
-            Get all cars
+            Get all cars in auto park by id
         post:
             Creation a car in auto park by id
     """
