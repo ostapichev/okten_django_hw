@@ -29,7 +29,7 @@ class ChatConsumer(GenericAsyncAPIConsumer):
             }
         )
         messages = await self.get_last_five_messages()
-        for item in messages:
+        for item in reversed(messages):
             await self.sender({
                 'message': item['message'],
                 'user': item['owner']
@@ -61,4 +61,7 @@ class ChatConsumer(GenericAsyncAPIConsumer):
 
     @database_sync_to_async
     def get_last_five_messages(self):
-        return [{'message': item.message, 'owner': item.owner.profile.surname} for item in ChatModel.objects.reverse()[:5]]
+        return [
+            {'message': item.message, 'owner': item.owner.profile.surname}
+            for item in ChatModel.objects.order_by('-id')[:5]
+        ]
