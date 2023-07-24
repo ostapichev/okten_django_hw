@@ -122,7 +122,7 @@ class AutoParkTestCase(APITestCase):
         self.assertEquals(response.data['name'], update_auto_park['name'])
 
     def test_delete_auto_park_id(self):
-        """Test method DELETE of class AutoParkRetrieveUpdateDestroyView"""
+        """Test method DELETE auto park by id of class AutoParkRetrieveUpdateDestroyView"""
         self._authenticate()
         sample_auto_park = {
             'name': 'Uklon'
@@ -132,31 +132,8 @@ class AutoParkTestCase(APITestCase):
         response = self.client.delete(reverse('auto_park_retrieve_update_destroy', kwargs={'pk': auto_park.id}))
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_all_create_cars_auto_park(self):
-        """Test method POST of class AutoParkCarListCreateView"""
-        self._authenticate()
-        count = CarModel.objects.count()
-        sample_auto_park = {
-            'name': 'Uklon'
-        }
-        sample_car = {
-            "brand": "Audi",
-            "body": "Sedan",
-            "price": 12000,
-            "year": 2010,
-        }
-        self.client.post(reverse('auto_parks_list_create'), sample_auto_park, format='json')
-        auto_park = AutoParkModel.objects.get(name=sample_auto_park['name'])
-        response = self.client.post(reverse(
-            'auto_park_car_list_create_view',
-            kwargs={'pk': auto_park.id}),
-            sample_car, format='json')
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(CarModel.objects.count(), count + 1)
-        self.assertEquals(response.data['brand'], 'Audi')
-
     def test_all_get_cars_auto_park(self):
-        """Test method GET of class AutoParkCarListCreateView"""
+        """Test method GET all cars in auto park by id of class AutoParkCarListCreateView"""
         self._authenticate()
         sample_auto_park = {
             'name': 'Uklon'
@@ -187,3 +164,26 @@ class AutoParkTestCase(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data[0]['brand'], sample_car1['brand'])
         self.assertEquals(response.data[1]['brand'], sample_car2['brand'])
+
+    def test_all_create_cars_auto_park(self):
+        """Test method POST create car in auto park by id of class AutoParkCarListCreateView"""
+        self._authenticate()
+        count = CarModel.objects.count()
+        sample_auto_park = {
+            'name': 'Uklon'
+        }
+        sample_car = {
+            "brand": "Audi",
+            "body": "Sedan",
+            "price": 12000,
+            "year": 2010,
+        }
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park, format='json')
+        auto_park = AutoParkModel.objects.get(name=sample_auto_park['name'])
+        response = self.client.post(reverse(
+            'auto_park_car_list_create_view',
+            kwargs={'pk': auto_park.id}),
+            sample_car, format='json')
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(CarModel.objects.count(), count + 1)
+        self.assertEquals(response.data['brand'], 'Audi')
