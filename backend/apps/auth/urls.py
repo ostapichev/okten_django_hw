@@ -6,10 +6,10 @@ from apps.auth.views import ActivateUserView, AuthTokenView, MeView, RecoveryPas
 
 urlpatterns = [
     path('', TokenObtainPairView.as_view(), name='auth_login'),
-    path('/activate/<str:token>', ActivateUserView.as_view()),
-    path('/refresh', TokenRefreshView.as_view()),
-    path('/recovery_password', RecoveryPasswordRequestView.as_view()),
-    path('/recovery_password/<str:token>', RecoveryPasswordView.as_view()),
-    path('/me', MeView.as_view()),
-    path('/socket_token', AuthTokenView.as_view())
+    path('/activate/<str:token>', ActivateUserView.as_view(), name='activate_user_view'),
+    path('/refresh', TokenRefreshView.as_view(), name='token_refresh_view'),
+    path('/recovery_password', RecoveryPasswordRequestView.as_view(), name='recovery_password_request'),
+    path('/recovery_password/<str:token>', RecoveryPasswordView.as_view(), name='recovery_password_view'),
+    path('/me', MeView.as_view(), name='me_view'),
+    path('/socket_token', AuthTokenView.as_view(), name='socket_token_view')
 ]

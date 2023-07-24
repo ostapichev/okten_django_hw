@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase
 
 from apps.users.models import UserModel as User
 
+from ...cars.models import CarModel
 from ..models import AutoParkModel
 
 UserMode: User = get_user_model()
@@ -13,6 +14,7 @@ UserMode: User = get_user_model()
 
 class AutoParkTestCase(APITestCase):
     def _authenticate(self):
+        """Authenticate user"""
         email = 'admin@gmail.com'
         password = 'P@$$word1'
         user = {
@@ -33,32 +35,24 @@ class AutoParkTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {response.data["access"]}')
 
     def test_all_auto_parks_view(self):
+        """Test method GET of class AutoParkListCreateView"""
+        sample_auto_park1 = {
+            "name": "Uber"
+        }
+        sample_auto_park2 = {
+            "name": "Taxi 30-40"
+        }
+        sample_auto_park3 = {
+            "name": "Taxi 838"
+        }
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park1)
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park2)
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park3)
         response = self.client.get(reverse('auto_parks_list_create'))
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
-    def test_all_cars_view_auto_park(self):
-        self._authenticate()
-        auto_park_test = {'name': 'Uklon'}
-        self.client.post(reverse('auto_parks_list_create'), auto_park_test, format='json')
-        auto_park = AutoParkModel.objects.get(name=auto_park_test['name'])
-        car_test1 = {
-            "brand": "Audi",
-            "body": "Sedan",
-            "price": 12000,
-            "year": 2010,
-        }
-        car_test2 = {
-            "brand": "Suzuki",
-            "body": "Jeep",
-            "price": 15000,
-            "year": 2006,
-        }
-        self.client.post(reverse('auto_park_car_list_create_view', kwargs={'pk': auto_park.id}),
-                         car_test1, format='json')
-        response = self.client.get(reverse('auto_park_car_list_create_view', kwargs={'pk': auto_park.id}))
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-
     def test_create_auto_park_without_auth(self):
+        """Test method POST of class AutoParkListCreateView without auth"""
         count = AutoParkModel.objects.count()
         sample_auto_park = {
             "name": "Uber"
@@ -68,6 +62,7 @@ class AutoParkTestCase(APITestCase):
         self.assertEquals(AutoParkModel.objects.count(), count)
 
     def test_create_auto_park(self):
+        """Test method POST of class AutoParkListCreateView with auth"""
         self._authenticate()
         count = AutoParkModel.objects.count()
         sample_auto_park = {
@@ -80,37 +75,115 @@ class AutoParkTestCase(APITestCase):
         self.assertIsInstance(response.data['cars'], list)
 
     def test_get_auto_park_id(self):
+        """Test method GET of class AutoParkRetrieveUpdateDestroyView"""
         self._authenticate()
-        auto_park_test = {'name': 'Uklon'}
-        self.client.post(reverse('auto_parks_list_create'), auto_park_test, format='json')
-        auto_park = AutoParkModel.objects.get(name=auto_park_test['name'])
+        sample_auto_park = {
+            'name': 'Uklon'
+        }
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park, format='json')
+        auto_park = AutoParkModel.objects.get(name=sample_auto_park['name'])
         response = self.client.get(reverse('auto_park_retrieve_update_destroy', kwargs={'pk': auto_park.id}))
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
     def test_put_auto_park_id(self):
+        """Test method PUT of class AutoParkRetrieveUpdateDestroyView"""
         self._authenticate()
-        auto_park_test = {'name': 'Uklon'}
-        self.client.post(reverse('auto_parks_list_create'), auto_park_test, format='json')
-        auto_park = AutoParkModel.objects.get(name=auto_park_test['name'])
-        response = self.client.put(reverse('auto_park_retrieve_update_destroy', kwargs={'pk': auto_park.id}),
-                                   {'name': 'OneTaxi'})
-        print(f'test put content: {response.data}')
+        sample_auto_park = {
+            'name': 'Uklon'
+        }
+        update_auto_park = {
+            'name': 'One Taxi'
+        }
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park, format='json')
+        auto_park = AutoParkModel.objects.get(name=sample_auto_park['name'])
+        response = self.client.put(reverse(
+            'auto_park_retrieve_update_destroy',
+            kwargs={'pk': auto_park.id}),
+            update_auto_park)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['name'], update_auto_park['name'])
 
     def test_patch_auto_park_id(self):
+        """Test method PATCH of class AutoParkRetrieveUpdateDestroyView"""
         self._authenticate()
-        auto_park_test = {'name': 'Uklon'}
-        self.client.post(reverse('auto_parks_list_create'), auto_park_test, format='json')
-        auto_park = AutoParkModel.objects.get(name=auto_park_test['name'])
-        response = self.client.patch(reverse('auto_park_retrieve_update_destroy', kwargs={'pk': auto_park.id}),
-                                     {'name': 'Taxi 838'})
-        print(f'test patch content: {response.data}')
+        sample_auto_park = {
+            'name': 'Uklon'
+        }
+        update_auto_park = {
+            'name': 'One Taxi'
+        }
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park, format='json')
+        auto_park = AutoParkModel.objects.get(name=sample_auto_park['name'])
+        response = self.client.patch(reverse(
+            'auto_park_retrieve_update_destroy',
+            kwargs={'pk': auto_park.id}),
+            update_auto_park)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['name'], update_auto_park['name'])
 
     def test_delete_auto_park_id(self):
+        """Test method DELETE of class AutoParkRetrieveUpdateDestroyView"""
         self._authenticate()
-        auto_park_test = {'name': 'Uklon'}
-        self.client.post(reverse('auto_parks_list_create'), auto_park_test, format='json')
-        auto_park = AutoParkModel.objects.get(name=auto_park_test['name'])
+        sample_auto_park = {
+            'name': 'Uklon'
+        }
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park, format='json')
+        auto_park = AutoParkModel.objects.get(name=sample_auto_park['name'])
         response = self.client.delete(reverse('auto_park_retrieve_update_destroy', kwargs={'pk': auto_park.id}))
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_all_create_cars_auto_park(self):
+        """Test method POST of class AutoParkCarListCreateView"""
+        self._authenticate()
+        count = CarModel.objects.count()
+        sample_auto_park = {
+            'name': 'Uklon'
+        }
+        sample_car = {
+            "brand": "Audi",
+            "body": "Sedan",
+            "price": 12000,
+            "year": 2010,
+        }
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park, format='json')
+        auto_park = AutoParkModel.objects.get(name=sample_auto_park['name'])
+        response = self.client.post(reverse(
+            'auto_park_car_list_create_view',
+            kwargs={'pk': auto_park.id}),
+            sample_car, format='json')
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(CarModel.objects.count(), count + 1)
+        self.assertEquals(response.data['brand'], 'Audi')
+
+    def test_all_get_cars_auto_park(self):
+        """Test method GET of class AutoParkCarListCreateView"""
+        self._authenticate()
+        sample_auto_park = {
+            'name': 'Uklon'
+        }
+        sample_car1 = {
+            "brand": "Audi",
+            "body": "Sedan",
+            "price": 12000,
+            "year": 2010,
+        }
+        sample_car2 = {
+            "brand": "Mazda",
+            "body": "Sedan",
+            "price": 15000,
+            "year": 2020,
+        }
+        self.client.post(reverse('auto_parks_list_create'), sample_auto_park, format='json')
+        auto_park = AutoParkModel.objects.get(name=sample_auto_park['name'])
+        self.client.post(reverse(
+            'auto_park_car_list_create_view',
+            kwargs={'pk': auto_park.id}),
+            sample_car1, format='json')
+        self.client.post(reverse(
+            'auto_park_car_list_create_view',
+            kwargs={'pk': auto_park.id}),
+            sample_car2, format='json')
+        response = self.client.get(reverse('auto_park_car_list_create_view', kwargs={'pk': auto_park.id}))
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data[0]['brand'], sample_car1['brand'])
+        self.assertEquals(response.data[1]['brand'], sample_car2['brand'])

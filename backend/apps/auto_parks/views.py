@@ -56,7 +56,7 @@ class AutoParkCarListCreateView(GenericAPIView):
     def get(self, *args, **kwargs):
         pk = kwargs['pk']
 
-        if not AutoParkModel.objects.filter(auto_park_id=pk):
+        if not AutoParkModel.objects.filter(pk=pk).exists():
             raise Http404
 
         cars = CarModel.objects.filter(auto_park_id=pk)

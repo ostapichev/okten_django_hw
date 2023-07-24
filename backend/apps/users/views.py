@@ -24,7 +24,7 @@ class UserListCreateView(ListCreateAPIView):
         get:
             Get all users
         post:
-            Creation an users
+            Creation a users
     """
     serializer_class = UserSerializer
     queryset = UserModel.objects.all_with_profiles()
