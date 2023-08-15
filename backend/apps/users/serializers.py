@@ -5,8 +5,10 @@ from rest_framework import serializers
 
 from core.services.email_service import EmailService
 
-from apps.users.models import ProfileModel
 from apps.users.models import UserModel as User
+
+from ..cars.serializers import CarSerializer
+from .models import ProfileModel
 
 UserModel: User = get_user_model()
 
@@ -17,24 +19,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'surname', 'age', 'avatar')
 
 
-class AvatarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfileModel
-        fields = ('avatar',)
-        extra_kwargs = {
-            'avatar': {
-                'required': True
-            }
-        }
-
-
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
+    cars = CarSerializer(many=True, read_only=True)
 
     @transaction.atomic
     def create(self, validated_data: dict):
-        profile = validated_data.pop('profile')
-        profile = ProfileModel.objects.create(**profile)
+        profile_data = validated_data.pop('profile')
+        profile = ProfileModel.objects.create(**profile_data)
         user = UserModel.objects.create_user(profile=profile, **validated_data)
         EmailService.register_email(user)
         return user
@@ -42,15 +34,42 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = (
-            'id', 'email', 'password', 'is_active', 'is_staff', 'is_superuser',
-            'last_login', 'created_at', 'updated_at', 'profile'
+            'id',
+            'email',
+            'password',
+            'is_active',
+            'is_premium',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'created_at',
+            'updated_at',
+            'profile',
+            'cars',
         )
         read_only_fields = (
-            'id', 'is_active', 'is_staff', 'is_superuser',
-            'last_login', 'created_at', 'updated_at',
+            'id',
+            'is_active',
+            'is_premium',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'created_at',
+            'updated_at',
         )
         extra_kwargs = {
             'password': {
                 'write_only': True
+            }
+        }
+
+
+class AvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfileModel
+        fields = ('avatar',)
+        extra_kwargs = {
+            'avatar': {
+                'required': True
             }
         }

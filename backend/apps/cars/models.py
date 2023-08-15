@@ -1,21 +1,27 @@
 from datetime import datetime
 
+from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 
 from core.enums.regex_enum import RegExEnum
 from core.models import BaseModel
+from core.services.upload_images_service import upload_photo_car
 
-from apps.auto_parks.models import AutoParkModel
-from apps.cars.choices.body_type_choices import BodyTypeChoices
-from apps.cars.manager import CarManager
+from apps.users.models import UserModel as User
+
+from .managers import CarManager
+
+UserModel: User = get_user_model()
 
 
 class CarModel(BaseModel):
     brand = models.CharField(max_length=25, validators=(
         validators.RegexValidator(RegExEnum.BRAND.pattern, RegExEnum.BRAND.msg),
     ))
-    body = models.CharField(max_length=11, choices=BodyTypeChoices.choices)
+    model = models.CharField(max_length=25, validators=(
+        validators.RegexValidator(RegExEnum.MODEL.pattern, RegExEnum.BRAND.msg),
+    ))
     price = models.IntegerField(validators=(
         validators.MinValueValidator(0),
         validators.MaxValueValidator(1000000)
@@ -24,9 +30,10 @@ class CarModel(BaseModel):
         validators.MinValueValidator(1990),
         validators.MaxValueValidator(datetime.now().year)
     ))
-    auto_park = models.ForeignKey(AutoParkModel, on_delete=models.CASCADE, related_name='cars')
+    user = models.ForeignKey(UserModel, on_delete=models.PROTECT, related_name='cars')
     objects = models.Manager()
-    my_objects = CarManager()
+    my_object = CarManager()
+    photo_car = models.ImageField(upload_to=upload_photo_car, blank=True)
 
     class Meta:
         db_table = 'cars'

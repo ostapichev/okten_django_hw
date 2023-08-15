@@ -6,7 +6,7 @@ from django.template.loader import get_template
 
 from configs.celery import app
 
-from core.dataclasses.user_dataclass import UserDataClass
+from core.dataclasses.user_dataclasses import UserDataClass
 from core.services.jwt_service import ActivateToken, JWTService, RecoveryToken
 
 from apps.users.models import UserModel as User

@@ -1,7 +1,5 @@
 from django_filters import rest_framework as filters
 
-from apps.cars.choices.body_type_choices import BodyTypeChoices
-
 
 class CarFilter(filters.FilterSet):
     year_lt = filters.NumberFilter('year', 'lt')
@@ -9,7 +7,7 @@ class CarFilter(filters.FilterSet):
     year_range = filters.RangeFilter('year')
     year_in = filters.BaseInFilter('year')
     brand_contains = filters.CharFilter('brand', 'icontains')
-    body = filters.ChoiceFilter('body', choices=BodyTypeChoices.choices)
+    model_contains = filters.CharFilter('model', 'icontains')
     order = filters.OrderingFilter(
-        fields={'id', 'brand', 'year', 'price'}
+        fields={'id', 'brand', 'model', 'year', 'price'}
     )

@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'core',
     'apps.auth',
     'apps.users',
-    'apps.auto_parks',
+    'apps.user_service',
     'apps.cars',
     'apps.chat'
 ]

@@ -8,17 +8,16 @@ from rest_framework.response import Response
 from core.services.email_service import EmailService
 from core.services.jwt_service import ActivateToken, JWTService, RecoveryToken, SocketToken
 
+from apps.auth.serializers import EmailSerializer, PasswordSerializer
 from apps.users.models import UserModel as User
 from apps.users.serializers import UserSerializer
-
-from .serializers import EmailSerializer, PasswordSerializer
 
 UserModel: User = get_user_model()
 
 
 class MeView(RetrieveAPIView):
     """
-        View my account
+        Get my account
     """
     serializer_class = UserSerializer
 
@@ -28,23 +27,23 @@ class MeView(RetrieveAPIView):
 
 class ActivateUserView(GenericAPIView):
     """
-        User activation
+        To activate my account
     """
     permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
 
-    @staticmethod
-    def post(*args, **kwargs):
+    def post(self, *args, **kwargs):
         token = kwargs['token']
         user: User = JWTService.validate_token(token, ActivateToken)
         user.is_active = True
         user.save()
         serializer = UserSerializer(user)
-        return Response(serializer.data)
+        return Response(serializer.data, status.HTTP_200_OK)
 
 
 class RecoveryPasswordRequestView(GenericAPIView):
     """
-        Recovery password
+        To change your password
     """
     permission_classes = (AllowAny,)
     serializer_class = EmailSerializer
@@ -55,12 +54,12 @@ class RecoveryPasswordRequestView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = get_object_or_404(UserModel, **serializer.data)
         EmailService.recovery_email(user)
-        return Response('check you email', status.HTTP_200_OK)
+        return Response('check your email', status.HTTP_200_OK)
 
 
 class RecoveryPasswordView(GenericAPIView):
     """
-        Change password
+        Activate token for change password
     """
     permission_classes = (AllowAny,)
     serializer_class = PasswordSerializer
@@ -70,10 +69,10 @@ class RecoveryPasswordView(GenericAPIView):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         token = kwargs['token']
-        user = JWTService.validate_token(token, RecoveryToken)
+        user: User = JWTService.validate_token(token, RecoveryToken)
         user.set_password(serializer.data['password'])
         user.save()
-        return Response('password changed', status.HTTP_200_OK)
+        return Response('Password changed', status.HTTP_200_OK)
 
 
 class AuthTokenView(GenericAPIView):

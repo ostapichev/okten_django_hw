@@ -16,6 +16,7 @@ class UserDataClass:
     email: str
     password: str
     is_active: bool
+    is_premium: bool
     is_staff: bool
     is_superuser: bool
     last_login: datetime

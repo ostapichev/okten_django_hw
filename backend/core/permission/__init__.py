@@ -1,2 +1,0 @@
-from .is_admin_or_write_only import IsAdminOrWriteOnlyPermission
-from .is_superuser import IsSuperUser

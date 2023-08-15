@@ -9,10 +9,10 @@ from drf_yasg.views import get_schema_view
 
 schema_view = get_schema_view(
     openapi.Info(
-        title='AutoParkAPI',
+        title='Okten_Auto_Ria',
         default_version='v1',
-        description='About Autoparks',
-        contact=openapi.Contact(email='admin@gmail.com')
+        description='About OktenAutoRia',
+        contact=openapi.Contact(email='ytoxos@gmail.com')
     ),
     public=True,
     permission_classes=[AllowAny]
@@ -20,8 +20,8 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('api/auth', include('apps.auth.urls')),
     path('api/cars', include('apps.cars.urls')),
-    path('api/auto_parks', include('apps.auto_parks.urls')),
     path('api/users', include('apps.users.urls')),
+    path('api/user_service', include('apps.user_service.urls')),
     path('api/doc', schema_view.with_ui('swagger', cache_timeout=0))
 ]
 

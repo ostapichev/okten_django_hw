@@ -9,19 +9,24 @@ class RegExEnum(Enum):
         _('First letter uppercase min 2 max 24 ch')
     )
 
+    MODEL = (
+        r'^[A-Z][a-zA-Z\d]{1,24}$',
+        _('First letter uppercase min 2 max 24 ch')
+    )
+
     EMAIL = (
         r'^[\w.%+-]+@gmail\.com$',
         _('The email domain must be gmail.com')
     )
 
     NAME = (
-        r'^[А-ЯЁІЇЄ][а-яёіїґє]{1,49}$',
-        _('This name must contain only Cyrillic characters.')
+        r'^[A-Z][a-zA-Z]{1,49}$',
+        _('This name must contain only characters.')
     )
 
     SURNAME = (
-        r'^[А-ЯЁІЇЄ][а-яёіїґє]{1,49}$',
-        _('This surname must contain only Cyrillic characters.')
+        r'^[A-Z][a-zA-Z]{1,49}$',
+        _('This surname must contain only characters.')
     )
 
     PASSWORD = (

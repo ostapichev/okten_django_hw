@@ -4,9 +4,9 @@ from django.db import models
 
 from core.enums.regex_enum import RegExEnum
 from core.models import BaseModel
-from core.services.upload_avatar_service import upload_avatar
+from core.services.upload_images_service import upload_avatar
 
-from apps.users.managers import UserManager
+from .managers import UserManager
 
 
 class ProfileModel(BaseModel):
@@ -28,7 +28,6 @@ class ProfileModel(BaseModel):
 
 
 class UserModel(AbstractBaseUser, PermissionsMixin, BaseModel):
-    USERNAME_FIELD = 'email'
     email = models.EmailField(unique=True, validators=(
         validators.RegexValidator(RegExEnum.EMAIL.pattern, RegExEnum.EMAIL.msg),
     ))
@@ -37,8 +36,10 @@ class UserModel(AbstractBaseUser, PermissionsMixin, BaseModel):
     ))
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    profile = models.OneToOneField(ProfileModel, on_delete=models.CASCADE, related_name='user', null=True)
+    is_premium = models.BooleanField(default=False)
     objects = UserManager()
+    profile = models.OneToOneField(ProfileModel, on_delete=models.CASCADE, related_name='user', null=True)
+    USERNAME_FIELD = 'email'
 
     class Meta:
         db_table = 'auth_user'

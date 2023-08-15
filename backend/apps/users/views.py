@@ -1,43 +1,42 @@
 from django.contrib.auth import get_user_model
+from django.http import Http404
 from django.utils.decorators import method_decorator
 
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListCreateAPIView, UpdateAPIView
-from rest_framework.permissions import AllowAny, IsAdminUser
-from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.views import Response
 
-from drf_yasg.utils import no_body, swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema
 
-from core.permission import IsAdminOrWriteOnlyPermission, IsSuperUser
-from core.services.email_service import EmailService
+from apps.users.models import UserModel as User
 
+from ..cars.models import CarModel
+from ..cars.serializers import CarSerializer
 from .filters import UserFilter
-from .models import UserModel as User
 from .serializers import AvatarSerializer, UserSerializer
 
 UserModel: User = get_user_model()
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(security=[]))
+@method_decorator(name='post', decorator=swagger_auto_schema(security=[]))
 class UserListCreateView(ListCreateAPIView):
     """
         get:
             Get all users
         post:
-            Creation a users
+            Create a user.
     """
     serializer_class = UserSerializer
     queryset = UserModel.objects.all_with_profiles()
     filterset_class = UserFilter
-    permission_classes = (IsAdminOrWriteOnlyPermission,)
-
-    def get_queryset(self):
-        return super().get_queryset().exclude(pk=self.request.user.pk)
+    permission_classes = (AllowAny,)
 
 
 class UserAddAvatarView(UpdateAPIView):
     """
-        Add an avatar to a user
+        Add avatar of the user
     """
     serializer_class = AvatarSerializer
     http_method_names = ('put',)
@@ -50,106 +49,93 @@ class UserAddAvatarView(UpdateAPIView):
         super().perform_update(serializer)
 
 
-class UserToAdminView(GenericAPIView):
+@method_decorator(name='get', decorator=swagger_auto_schema(security=[]))
+class UserCarCreateView(GenericAPIView):
     """
-        Add administrator rights to the user
+        get:
+            Get car by id user id
+        post:
+            Create car by user id
     """
-    permission_classes = (IsSuperUser,)
-    queryset = UserModel.objects.all()
     serializer_class = UserSerializer
-
-    def get_queryset(self):
-        return super().get_queryset().exclude(pk=self.request.user.pk)
-
-    @swagger_auto_schema(request_body=no_body)
-    def patch(self, *args, **kwargs):
-        user = self.get_object()
-        if not user.is_staff:
-            user.is_staff = True
-            user.save()
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status.HTTP_200_OK)
-
-
-class AdminToUserView(GenericAPIView):
-    """
-        Revoke administrator rights from a user
-    """
-    permission_classes = (IsSuperUser,)
     queryset = UserModel.objects.all()
 
-    def get_queryset(self):
-        return super().get_queryset().exclude(pk=self.request.user.pk)
-
-    def patch(self, *args, **kwargs):
-        user: User = self.get_object()
-        if user.is_staff:
-            user.is_staff = False
-            user.save()
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status.HTTP_200_OK)
-
-
-class BlockUserView(GenericAPIView):
-    """
-        Block user
-    """
-    permission_classes = (IsAdminUser,)
-    queryset = UserModel.objects.all()
-
-    def get_queryset(self):
-        return super().get_queryset().exclude(pk=self.request.user.pk)
-
-    def patch(self, *args, **kwargs):
-        user = self.get_object()
-        if user.is_active:
-            user.is_active = False
-            user.save()
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status.HTTP_200_OK)
-
-
-class UnBlockUserView(GenericAPIView):
-    """
-        Unblock user
-    """
-    permission_classes = (IsAdminUser,)
-    queryset = UserModel.objects.all()
-
-    def get_queryset(self):
-        return super().get_queryset().exclude(pk=self.request.user.pk)
-
-    def patch(self, *args, **kwargs):
-        user = self.get_object()
-        if not user.is_active:
-            user.is_active = True
-            user.save()
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status.HTTP_200_OK)
-
-
-class BlockAdminUserView(BlockUserView):
-    """
-        Block Admin
-    """
-    permission_classes = (IsSuperUser,)
-    queryset = UserModel.objects.all()
-
-
-class UnBlockAdminUserView(UnBlockUserView):
-    """
-        Unblock Admin
-    """
-    permission_classes = (IsSuperUser,)
-    queryset = UserModel.objects.all()
-
-
-class ActivateEmail(GenericAPIView):
-    """
-        Send email to activate user
-    """
-    permission_classes = (AllowAny,)
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return (AllowAny(),)
+        return (AllowAny(),)
 
     def get(self, *args, **kwargs):
-        EmailService.test_email()
-        return Response('ok')
+        pk = kwargs['pk']
+        if not UserModel.objects.filter(pk=pk).exists():
+            raise Http404()
+        cars = CarModel.objects.filter(user_id=pk)
+        serializer = CarSerializer(cars, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def post(self, *args, **kwargs):
+        current_user_id = self.request.user.pk
+        pk = kwargs['pk']
+        data = self.request.data
+        serializer = CarSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        if not UserModel.objects.filter(pk=pk).exists() or current_user_id != pk:
+            raise Http404()
+        cars = CarModel.objects.filter(user_id=pk)
+        if len(cars) < 1 or self.request.user.is_premium:
+            serializer.save(user_id=pk)
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        return Response('You must to buy the premium account')
+
+
+class UserCarUpdateDestroyView(GenericAPIView):
+    """
+        put:
+            Full update car by id
+        patch:
+            Partial update car by id
+        delete:
+            Delete car by id
+    """
+    queryset = UserModel.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
+
+    def put(self, *args, **kwargs):
+        current_user_id = self.request.user.pk
+        pk = kwargs['user_id']
+        data = self.request.data
+        cars_data = CarModel.objects.filter(user_id=pk)
+        car = cars_data.get(id=kwargs['car_id'])
+        serializer = CarSerializer(car, data)
+        serializer.is_valid(raise_exception=True)
+        if not UserModel.objects.filter(pk=pk).exists() or current_user_id != pk:
+            raise Http404()
+        serializer.save(user_id=pk)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def patch(self, *args, **kwargs):
+        current_user_id = self.request.user.pk
+        pk = kwargs['user_id']
+        data = self.request.data
+        cars_data = CarModel.objects.filter(user_id=pk)
+        car = cars_data.get(id=kwargs['car_id'])
+        serializer = CarSerializer(car, data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        if not UserModel.objects.filter(pk=pk).exists() or current_user_id != pk:
+            raise Http404()
+        serializer.save(user_id=pk)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def delete(self, *args, **kwargs):
+        current_user_id = self.request.user.pk
+        pk = kwargs['user_id']
+        cars_data = CarModel.objects.filter(user_id=pk)
+        car = cars_data.get(id=kwargs['car_id'])
+        if current_user_id != pk:
+            raise Http404()
+        car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
