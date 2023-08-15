@@ -38,3 +38,4 @@ class CarAddPhotoView(UpdateAPIView):
     def perform_update(self, serializer):
         self.get_object().photo_car.delete()
         super().perform_update(serializer)
+

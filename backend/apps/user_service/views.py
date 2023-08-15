@@ -2,10 +2,9 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from djangochannelsrestframework.permissions import IsAuthenticated
 from drf_yasg.utils import no_body, swagger_auto_schema
 
 from core.permissions.is_extra_user import IsSuperUser

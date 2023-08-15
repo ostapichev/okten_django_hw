@@ -30,11 +30,32 @@ class CarModel(BaseModel):
         validators.MinValueValidator(1990),
         validators.MaxValueValidator(datetime.now().year)
     ))
-    user = models.ForeignKey(UserModel, on_delete=models.PROTECT, related_name='cars')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='cars')
     objects = models.Manager()
     my_object = CarManager()
     photo_car = models.ImageField(upload_to=upload_photo_car, blank=True)
 
     class Meta:
         db_table = 'cars'
+        ordering = ('id',)
+
+
+class BrandCarModel(models.Model):
+    brand = models.CharField(max_length=25, validators=(
+        validators.RegexValidator(RegExEnum.BRAND.pattern, RegExEnum.BRAND.msg),
+    ))
+
+    class Meta:
+        db_table = 'car_brands'
+        ordering = ('id',)
+
+
+class ModelCarModel(models.Model):
+    brand_name = models.CharField(max_length=25, validators=(
+        validators.RegexValidator(RegExEnum.BRAND.pattern, RegExEnum.BRAND.msg),
+    ))
+    brand = models.ForeignKey(BrandCarModel, on_delete=models.PROTECT, related_name='car_model', null=True)
+
+    class Meta:
+        db_table = 'car_models'
         ordering = ('id',)

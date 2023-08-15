@@ -21,6 +21,9 @@ class ProfileModel(BaseModel):
         validators.MaxValueValidator(150)
     ))
     avatar = models.ImageField(upload_to=upload_avatar, blank=True)
+    location = models.CharField(max_length=30, validators=(
+        validators.RegexValidator(RegExEnum.NAME.pattern, RegExEnum.NAME.msg),
+    ))
 
     class Meta:
         db_table = 'profile'
@@ -44,3 +47,14 @@ class UserModel(AbstractBaseUser, PermissionsMixin, BaseModel):
     class Meta:
         db_table = 'auth_user'
         ordering = ('id',)
+
+
+class CityModel(models.Model):
+    name = models.CharField(max_length=30, validators=(
+        validators.RegexValidator(RegExEnum.NAME.pattern, RegExEnum.NAME.msg),
+    ))
+
+    class Meta:
+        db_table = 'cities'
+        ordering = ('id', 'name')
+

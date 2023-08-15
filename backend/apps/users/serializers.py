@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from core.services.email_service import EmailService
 
+from apps.users.models import CityModel
 from apps.users.models import UserModel as User
 
 from ..cars.serializers import CarSerializer
@@ -14,9 +15,17 @@ UserModel: User = get_user_model()
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    def validate_location(self, value):
+        try:
+            city = CityModel.objects.get(name=value)
+            return city.name
+        except CityModel.DoesNotExist:
+            raise serializers.ValidationError(
+                "This city does not exist in the database. Please contact the site administrator.")
+
     class Meta:
         model = ProfileModel
-        fields = ('id', 'name', 'surname', 'age', 'avatar')
+        fields = ('id', 'name', 'surname', 'age', 'location', 'avatar')
 
 
 class UserSerializer(serializers.ModelSerializer):
